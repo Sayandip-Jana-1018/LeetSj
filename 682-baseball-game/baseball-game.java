@@ -21,6 +21,7 @@ class Solution {
         int sum = 0;
         for(int i=0; i<index; i++){
             sum += arr[i];
+            System.out.println(arr[i]);
         }
         return sum;
     }
