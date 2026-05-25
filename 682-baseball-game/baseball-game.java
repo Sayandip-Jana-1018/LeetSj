@@ -17,7 +17,7 @@ class Solution {
                 index++;
             }
         }
-                int totalSum = 0;
+        int totalSum = 0;
         for (int i = 0; i < index; i++) {
             totalSum += stack[i];
         }
