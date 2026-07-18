@@ -7,10 +7,10 @@
 | Metric | Result |
 |--------|--------|
 | Runtime | 0 ms |
-| Memory | 45.2 MB |
+| Memory | 44.9 MB |
 | Language | java |
 
 ## Links
 
 - [View Problem on LeetCode](https://leetcode.com/problems/find-greatest-common-divisor-of-array/)
-- [View My Submission](https://leetcode.com/submissions/detail/2071979919/)
+- [View My Submission](https://leetcode.com/submissions/detail/2071959860/)
