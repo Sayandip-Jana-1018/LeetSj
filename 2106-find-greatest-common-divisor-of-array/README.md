@@ -13,4 +13,4 @@
 ## Links
 
 - [View Problem on LeetCode](https://leetcode.com/problems/find-greatest-common-divisor-of-array/)
-- [View My Submission](https://leetcode.com/submissions/detail/2071980322/)
+- [View My Submission](https://leetcode.com/submissions/detail/2071980096/)
