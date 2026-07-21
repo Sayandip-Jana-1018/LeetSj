@@ -1,2 +1,2 @@
 LeetCode is fun !
-![LeetPush](http://localhost:3000/api/badge/sayandip_jana)
+![LeetPush](http://leetgit-sj.vercel.app/api/badge/sayandip_jana)
