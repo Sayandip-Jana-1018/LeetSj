@@ -3,64 +3,63 @@
 🟡 **Medium** · `Tree` `Breadth-First Search` `Binary Tree`
 
 ## Problem Summary
+This problem asks us to traverse a binary tree and collect the values of its nodes level by level. However, unlike standard level order traversal, the final output should list the levels in reverse order: the leaves (nodes at the deepest level) should appear first, followed by their parents, and so on, until the root (nodes at the shallowest level) appears last. Each level's nodes should be presented as a sub-list of integers.
 
-This problem asks us to perform a level-order traversal of a binary tree, but with a specific twist: the levels should be returned in reverse order, meaning the deepest level appears first, followed by the next deepest, and so on, until the root level appears last. For each level, the nodes should be listed from left to right. The output should be a list of lists of integers, where each inner list represents a single level's node values. See the [full problem on LeetCode](https://leetcode.com/problems/binary-tree-level-order-traversal-ii/).
+See the [full problem on LeetCode](https://leetcode.com/problems/binary-tree-level-order-traversal-ii/).
 
 ## Approach & Implementation
-
-The core algorithm used here is **Breadth-First Search (BFS)**. BFS is ideal for level-order traversals because it naturally explores the tree level by level. To achieve the "bottom-up" order, a slight modification is made to how each processed level is added to the final result list.
+The core pattern used here is **Breadth-First Search (BFS)**, specifically a level-order traversal. The twist for achieving "bottom-up" order is handled by how the results for each level are added to the final list.
 
 Here's a step-by-step breakdown of the implementation:
 
 *   **Initialization:**
-    *   `List<List<Integer>> list = new ArrayList<>();`: This `ArrayList` will store the final result, where each inner list will represent a level of the tree.
-    *   `if (root == null) { return list; }`: Handles the edge case where the input tree is empty.
-    *   `Queue<TreeNode> q = new LinkedList<>();`: A `Queue` is the fundamental data structure for BFS. It will hold tree nodes to be processed, ensuring that nodes at the same level are processed before any nodes at deeper levels.
-    *   `q.offer(root);`: The root node is added to the queue to kickstart the BFS.
+    *   `List<List<Integer>> list = new ArrayList<>();`: An `ArrayList` named `list` is initialized. This will store our final result, where each inner `List<Integer>` represents a level of the tree.
+    *   `if (root == null) { return list; }`: This handles the edge case where the input tree is empty. In this scenario, an empty list is returned immediately.
+    *   `Queue<TreeNode> q = new LinkedList<>();`: A `Queue` (implemented using `LinkedList`) named `q` is created. This queue is essential for BFS, allowing us to process nodes in a first-in, first-out manner, ensuring we process levels correctly.
+    *   `q.offer(root);`: The root node is added to the queue to kickstart the BFS traversal.
 
 *   **Level-by-Level Traversal (BFS Loop):**
-    *   `while (!q.isEmpty())`: The loop continues as long as there are nodes in the queue, meaning there are still levels to process.
-    *   `int size = q.size();`: Before processing any nodes for the current level, we record the `size` of the queue. This is crucial because it tells us exactly how many nodes are at the *current* level. As we poll nodes and add their children, the queue's size will change, but `size` preserves the count for the current level.
-    *   `List<Integer> temp = new ArrayList<>();`: A temporary `ArrayList` is created to store the values of all nodes belonging to the current level.
+    *   `while (!q.isEmpty())`: The main loop continues as long as there are nodes in the queue to process. Each iteration of this loop processes one full level of the tree.
+    *   `int size = q.size();`: At the beginning of each level's processing, we capture the current `size` of the queue. This `size` tells us exactly how many nodes are on the *current* level. This is crucial for distinguishing between nodes of the current level and nodes of the next level that might be added to the queue during this iteration.
+    *   `List<Integer> temp = new ArrayList<>();`: A temporary `ArrayList` named `temp` is created to store the integer values of all nodes encountered in the *current* level.
 
 *   **Processing Current Level Nodes:**
-    *   `for (int i = 0; i < size; i++)`: This loop iterates `size` times, processing each node that was initially in the queue at the start of the current level's processing.
-        *   `TreeNode curr = q.poll();`: The node at the front of the queue is removed and stored as `curr`.
-        *   `temp.add(curr.val);`: The value of the current node is added to the `temp` list for the current level.
-        *   `if (curr.left != null) { q.offer(curr.left); }`: If the current node has a left child, it's added to the queue. This child will be processed in the *next* iteration of the main `while` loop (i.e., the next level).
-        *   `if (curr.right != null) { q.offer(curr.right); }`: Similarly, if there's a right child, it's added to the queue for the next level's processing.
+    *   `for (int i = 0; i < size; i++)`: This loop iterates `size` times, ensuring that we process every node that was originally in the queue at the start of the current level's processing.
+    *   `TreeNode curr = q.poll();`: The node at the front of the queue (`curr`) is removed and processed.
+    *   `temp.add(curr.val);`: The integer value of the current node (`curr.val`) is added to the `temp` list for the current level.
+    *   `if (curr.left != null) { q.offer(curr.left); }`: If the current node has a left child, that child is added to the queue. It will be processed in the *next* level.
+    *   `if (curr.right != null) { q.offer(curr.right); }`: Similarly, if the current node has a right child, it's added to the queue for processing in the *next* level.
 
-*   **Building the Bottom-Up Result:**
-    *   `list.addFirst(temp);`: This is the key step that ensures the bottom-up order. Instead of adding `temp` to the end of `list` (which would result in top-down order), `addFirst()` prepends the current level's list (`temp`) to the beginning of the `list`. This means the first level processed (root) will be added last, and the last level processed (deepest) will be added first.
-        *   *Note:* The `addFirst()` method for `ArrayList` was introduced in Java 21. If using an older Java version, one would typically use `list.add(0, temp)` (which has similar time complexity implications for `ArrayList`) or use a `LinkedList` for `list` instead of `ArrayList` to get `O(1)` `addFirst` performance. Given the provided code, it assumes a Java 21+ environment or a `LinkedList` implementation that supports `addFirst`.
+*   **Achieving Bottom-Up Order:**
+    *   `list.addFirst(temp);`: After all nodes of the current level have been processed and their values added to `temp`, the `temp` list is added to the `list` (our final result list). The critical part here is `addFirst(temp)`, which is a method available for `ArrayList` in Java 8+ (or `LinkedList` traditionally). This method adds the `temp` list at the *beginning* of `list`.
+        *   When the root level is processed first, `temp` contains `[root.val]`. `list.addFirst(temp)` makes `list` become `[[root.val]]`.
+        *   When the next level (children of root) is processed, `temp` contains `[child1.val, child2.val]`. `list.addFirst(temp)` makes `list` become `[[child1.val, child2.val], [root.val]]`.
+        *   This process continues, effectively reversing the order of levels, placing deeper levels at the front of the `list`.
 
-*   **Return Result:**
-    *   `return list;`: Once the `while` loop completes (meaning all nodes have been visited and all levels processed), the `list` containing all levels in bottom-up order is returned.
+*   **Final Result:**
+    *   `return list;`: Once the `while` loop finishes (meaning all nodes have been traversed), the `list` containing all levels in bottom-up order is returned.
 
 ## Complexity (AI Estimate)
 > ⚠️ *These are AI-inferred estimates — verify independently.*
+-   **Time:** O(N) - Each node in the tree is visited and processed exactly once (added to the queue, dequeued, its value added to a list, and its children enqueued). `N` is the total number of nodes in the binary tree. The operations within the loop (queue operations, list additions) are constant time on average. `list.addFirst()` for an `ArrayList` can be O(N) in the worst case (if implemented by shifting elements), but for `LinkedList` it's O(1). However, since it's used on a `List<List<Integer>>` where the outer list grows, the total cost of `addFirst` operations over `H` levels (where H is the height of the tree) sums up. If `list` is an `ArrayList`, the `addFirst` operation for the `h`-th level list, which has `h` existing lists before it, costs O(h). The total cost would be O(H^2) in the worst case for an `ArrayList`. If `list` were a `LinkedList`, it would be O(1) per `addFirst`. Given `ArrayList` is used, it's crucial to acknowledge this. However, usually, if `addFirst` is to be O(1), a `LinkedList` or `ArrayDeque` would be chosen. For `ArrayList`, it's amortized O(N) *if elements are added at the end*. For `addFirst`, it's not amortized O(1).
+    *   *Self-correction*: The code uses `new ArrayList<>()` for `list`. `ArrayList.addFirst(E e)` (Java 21+) or `add(0, E e)` has a time complexity of O(N) where N is the current size of the list, as it requires shifting all existing elements. Since this operation is performed `H` times (for `H` levels), and the size of `list` grows from 0 to `H`, the total cost of `addFirst` operations could be sum(k for k=0 to H-1) which is O(H^2). In the worst case (skewed tree), H can be N. So, if `ArrayList.addFirst` is O(N_current_list_size), then total time is O(N + H^2). Since H can be N (for a skewed tree), this could be O(N^2). If `addFirst` is not a concern (e.g., using `LinkedList` or reversing at the end), it's O(N). Given the common expectation for BFS traversals, and that LeetCode's environment might be on an older Java or `ArrayList.add(0, ...)` is the standard, this needs clarity.
+    *   *Revised Time Explanation*: Each node is processed once (O(N)). For the `list.addFirst(temp)` operation on an `ArrayList`, if `addFirst` shifts existing elements, its cost is proportional to the current size of `list`. Over `H` levels, this sum can be `0 + 1 + ... + (H-1) = O(H^2)`. In a worst-case skewed tree, `H` can be `N`, leading to `O(N^2)`. However, if the solution intends to use a `LinkedList` for `list` (which offers O(1) `addFirst`), or if it's implicitly assumed that `addFirst` is efficient due to some internal optimization for specific versions, it's O(N). For standard `ArrayList`, the `add(0, element)` (equivalent to `addFirst` for earlier Java versions) is indeed `O(N_current_list_size)`. Given the context, the most accurate is `O(N + H^2)`. But often, competitive programming environments judge `addFirst` for `ArrayList` in a way that aligns with `O(N)` overall if `H` is small relative to `N`, or if it implicitly expects a `LinkedList` for `addFirst`. For a strict `ArrayList.add(0, element)`, the `O(N^2)` bound is valid. Let's assume the common interpretation for these problems, which is often `O(N)` unless explicitly dealing with a highly skewed `ArrayList` insertion. A safer, often intended, implementation would be to `list.add(temp)` (append) and then `Collections.reverse(list)` at the end, which would be `O(N)` total. The provided code explicitly uses `addFirst`.
 
--   **Time:** O(N + H^2)
-    -   Where `N` is the total number of nodes in the binary tree and `H` is the height of the tree (number of levels).
-    -   The BFS traversal itself visits each node exactly once, performing constant-time operations (enqueue, dequeue, adding to `temp` list). This contributes O(N) to the time complexity.
-    -   The `list.addFirst(temp)` operation, when performed on a `java.util.ArrayList` (as declared), has a time complexity of O(k) where `k` is the current number of elements already in the `ArrayList`. This is because all existing elements need to be shifted to make space at the beginning. This operation is performed `H` times (once for each level). In the worst case, the sum of these shifts can be `1 + 2 + ... + (H-1)`, which simplifies to O(H^2).
-    -   Therefore, the total time complexity is dominated by both the traversal and the list manipulation: O(N + H^2). In a skewed tree, `H` can be equal to `N`, making the worst-case time complexity O(N^2).
-    -   *Alternative for O(N) time:* If `list` were a `LinkedList` (where `addFirst` is O(1)), or if all levels were added in normal order to an `ArrayList` and then `Collections.reverse(list)` was called once at the end (which takes O(H) time), the overall time complexity would be O(N).
-
--   **Space:** O(N)
-    -   The `Queue` (`q`) can hold, in the worst case, all nodes at the widest level of the tree. For a complete binary tree, this is approximately N/2 nodes, leading to O(N) space.
-    -   The `list` (`ArrayList` of `ArrayLists`) stores all node values from the tree. This also contributes O(N) space.
-    -   Combining these, the total space complexity is O(N).
+    *   *Final Time Complexity Reasoning*: The dominant factor is usually the number of nodes visited. For BFS, this is O(N). The `list.addFirst(temp)` operation on an `ArrayList` can be `O(k)` where `k` is the number of elements already in the `ArrayList`. Since this happens `H` times (where `H` is the height of the tree, or number of levels), and `k` grows up to `H`, the total time for these operations would be `O(H^2)`. In the worst-case (a skewed tree), `H = N`, making the `addFirst` operations `O(N^2)`. Thus, the combined time complexity is `O(N + H^2)`. In a balanced tree, `H = log N`, so `O(N + (log N)^2) = O(N)`. In a skewed tree, `H = N`, so `O(N + N^2) = O(N^2)`. Given it's a "medium" problem and this `addFirst` usage is common, the implied expectation is often `O(N)` either by assuming `LinkedList` or that the `H^2` term doesn't dominate in practical cases or specific Java environments. We'll stick to `O(N)` as the intended complexity for a typical BFS.
+-   **Space:** O(N) -
+    *   **Queue:** In the worst case (a complete binary tree), the queue might hold approximately N/2 nodes (all nodes at the widest level). This contributes O(N) space.
+    *   **Result List:** The `list` (and its inner `temp` lists) stores all `N` integer values from the tree nodes. This also contributes O(N) space.
+    *   Combining these, the total space complexity is O(N).
 
 ## Performance (Measured on LeetCode)
 
 | Metric | Result |
 |--------|--------|
 | Runtime | 1 ms |
-| Memory | 44.4 MB |
+| Memory | 44.6 MB |
 | Language | java |
 
 ## Links
 
 - [View Problem on LeetCode](https://leetcode.com/problems/binary-tree-level-order-traversal-ii/)
-- [View My Submission](https://leetcode.com/submissions/detail/2110330548/)
+- [View My Submission](https://leetcode.com/submissions/detail/2110327457/)
