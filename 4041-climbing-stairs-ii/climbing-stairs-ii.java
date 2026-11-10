@@ -1,13 +1,12 @@
 class Solution {
     public int climbStairs(int n, int[] costs) {
-        costs = IntStream.concat(IntStream.of(0), Arrays.stream(costs)).toArray();
-        int a = costs[n], b = Integer.MAX_VALUE / 2, c = Integer.MAX_VALUE / 2;  
-        for (int i = n - 1; i >= 0; i--) {
-            int cur = costs[i] + Math.min(a + 1, Math.min(b + 4, c + 9));  
-            c = b;
-            b = a;
-            a = cur;
+        int a = 0, b = 0, c = 0;
+        for (int cost : costs) {
+            int z = Math.min(Math.min(a + 9, b + 4), c + 1) + cost;
+            a = b;
+            b = c;
+            c = z;
         }
-        return a;
+        return c;
     }
 }
